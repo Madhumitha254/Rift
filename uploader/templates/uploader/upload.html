@@ -3,15 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VCF Upload</title>
+    <title>Pharmacogenomic Analyzer</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 2rem;
-            color: #1f2937;
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --ink: #12263a;
+            --muted: #4b5d70;
+            --brand: #0f766e;
+            --brand-soft: #d1fae5;
+            --danger: #b91c1c;
+            --danger-soft: #fee2e2;
+            --border: #dbe7ef;
+            --safe: #065f46;
+            --adjust: #9a3412;
+            --toxic: #7f1d1d;
+            --unknown: #334155;
         }
-        .container {
-            max-width: 560px;
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: radial-gradient(circle at top right, #e0f2fe, var(--bg) 45%);
+            color: var(--ink);
+        }
+        .page {
+            max-width: 980px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 8px 26px rgba(15, 118, 110, 0.08);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            margin: 0 0 0.35rem;
+            font-size: 1.8rem;
+            letter-spacing: 0.02em;
+        }
+        .subtitle {
+            margin: 0 0 1rem;
+            color: var(--muted);
         }
         .field {
             margin-bottom: 1rem;
@@ -21,24 +56,33 @@
             margin-bottom: 0.25rem;
             font-weight: 600;
         }
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+        }
         .error-list {
-            background: #fef2f2;
-            border: 1px solid #ef4444;
-            color: #991b1b;
+            background: var(--danger-soft);
+            border: 1px solid #fca5a5;
+            color: var(--danger);
             padding: 0.75rem;
             margin-bottom: 1rem;
             border-radius: 6px;
         }
         .error {
-            color: #b91c1c;
+            color: var(--danger);
             margin-top: 0.25rem;
             margin-bottom: 0;
             font-size: 0.9rem;
         }
         .success {
-            background: #ecfdf5;
-            border: 1px solid #10b981;
-            color: #065f46;
+            background: var(--brand-soft);
+            border: 1px solid #34d399;
+            color: var(--safe);
             padding: 0.75rem;
             margin-bottom: 1rem;
             border-radius: 6px;
@@ -47,54 +91,239 @@
             padding: 0.6rem 1rem;
             border: 0;
             border-radius: 6px;
-            background: #2563eb;
+            background: var(--brand);
             color: #fff;
             cursor: pointer;
+            font-weight: 700;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .stat {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            background: #fcfefe;
+        }
+        .stat-label {
+            margin: 0 0 0.2rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--muted);
+        }
+        .stat-value {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .risk-banner {
+            border-radius: 12px;
+            padding: 0.9rem;
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.9rem;
+            border: 1px solid var(--border);
+        }
+        .risk-safe {
+            color: var(--safe);
+            background: #ecfdf3;
+        }
+        .risk-adjust-dosage {
+            color: var(--adjust);
+            background: #fff7ed;
+        }
+        .risk-toxic {
+            color: var(--toxic);
+            background: #fef2f2;
+        }
+        .risk-unknown {
+            color: var(--unknown);
+            background: #f1f5f9;
+        }
+        .label {
+            color: var(--muted);
+            font-weight: 600;
+            margin-right: 0.35rem;
+        }
+        .block {
+            margin-bottom: 0.8rem;
+        }
+        details {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem 0.8rem;
+            background: #fff;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .trace-row {
+            margin: 0.45rem 0;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+        .metric {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 0.65rem;
+        }
+        .metric-key {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0 0 0.2rem;
+        }
+        .metric-value {
+            margin: 0;
+            font-weight: 700;
+        }
+        @media (max-width: 640px) {
+            .page {
+                margin: 0.75rem auto;
+            }
+            .panel {
+                padding: 1rem;
+            }
+            .risk-banner {
+                font-size: 1.35rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Upload VCF</h1>
+    <div class="page">
+        <section class="panel">
+            <h1>Clinical PGx Analyzer</h1>
+            <p class="subtitle">Upload a VCF and evaluate drug risk using deterministic CPIC logic.</p>
 
-        {% if success_message %}
-            <div class="success">
-                <p>{{ success_message }}</p>
-                {% if saved_path %}
-                    <p>Saved to: {{ saved_path }}</p>
-                {% endif %}
-            </div>
+            {% if success_message %}
+                <div class="success">
+                    <p>{{ success_message }}</p>
+                    {% if saved_path %}
+                        <p>Saved to: {{ saved_path }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="error-list">
+                    {% for error in form.non_field_errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="field">
+                    <label for="{{ form.drug_name.id_for_label }}">Drug Name</label>
+                    {{ form.drug_name }}
+                    {% for error in form.drug_name.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="field">
+                    <label for="{{ form.vcf_file.id_for_label }}">VCF File</label>
+                    {{ form.vcf_file }}
+                    {% for error in form.vcf_file.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <button type="submit">Upload and Analyze</button>
+            </form>
+        </section>
+
+        {% if analysis_result %}
+            <section class="panel">
+                <div class="risk-banner risk-{{ analysis_result.risk|slugify }}">{{ analysis_result.risk }}</div>
+
+                <div class="result-grid">
+                    <div class="stat">
+                        <p class="stat-label">Patient ID</p>
+                        <p class="stat-value">{{ analysis_result.patient_id }}</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-label">Drug</p>
+                        <p class="stat-value">{{ analysis_result.drug }}</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-label">Gene</p>
+                        <p class="stat-value">{{ analysis_result.gene }}</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-label">Diplotype</p>
+                        <p class="stat-value">{{ analysis_result.diplotype }}</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-label">Phenotype</p>
+                        <p class="stat-value">{{ analysis_result.phenotype }}</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-label">Confidence Score</p>
+                        <p class="stat-value">{{ analysis_result.confidence_score }}</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-label">Severity</p>
+                        <p class="stat-value">{{ analysis_result.severity }}</p>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <span class="label">Recommendation:</span>
+                    <span>{{ analysis_result.recommendation }}</span>
+                </div>
+                <div class="block">
+                    <span class="label">Gemini Explanation:</span>
+                    <span>{{ analysis_result.explanation }}</span>
+                </div>
+
+                <details>
+                    <summary>Clinical Decision Trace</summary>
+                    <p class="trace-row"><span class="label">Drug Requested:</span>{{ analysis_result.clinical_trace.drug_requested }}</p>
+                    <p class="trace-row"><span class="label">Required Gene:</span>{{ analysis_result.clinical_trace.required_gene }}</p>
+                    <p class="trace-row"><span class="label">Detected Diplotype:</span>{{ analysis_result.clinical_trace.detected_diplotype }}</p>
+                    <p class="trace-row"><span class="label">Derived Phenotype:</span>{{ analysis_result.clinical_trace.derived_phenotype }}</p>
+                    <p class="trace-row"><span class="label">CPIC Rule Applied:</span>{{ analysis_result.clinical_trace.cpic_rule_applied }}</p>
+                    <p class="trace-row"><span class="label">Final Risk Outcome:</span>{{ analysis_result.clinical_trace.final_risk_outcome }}</p>
+                </details>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <p class="metric-key">vcf_parsing_success</p>
+                        <p class="metric-value">{{ analysis_result.quality_metrics.vcf_parsing_success }}</p>
+                    </div>
+                    <div class="metric">
+                        <p class="metric-key">gene_detected</p>
+                        <p class="metric-value">{{ analysis_result.quality_metrics.gene_detected }}</p>
+                    </div>
+                    <div class="metric">
+                        <p class="metric-key">rule_applied</p>
+                        <p class="metric-value">{{ analysis_result.quality_metrics.rule_applied }}</p>
+                    </div>
+                    <div class="metric">
+                        <p class="metric-key">confidence_score</p>
+                        <p class="metric-value">{{ analysis_result.quality_metrics.confidence_score }}</p>
+                    </div>
+                    <div class="metric">
+                        <p class="metric-key">processing_time_ms</p>
+                        <p class="metric-value">{{ analysis_result.quality_metrics.processing_time_ms }}</p>
+                    </div>
+                </div>
+            </section>
         {% endif %}
-
-        {% if form.non_field_errors %}
-            <div class="error-list">
-                {% for error in form.non_field_errors %}
-                    <p class="error">{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="field">
-                <label for="{{ form.drug_name.id_for_label }}">Drug Name</label>
-                {{ form.drug_name }}
-                {% for error in form.drug_name.errors %}
-                    <p class="error">{{ error }}</p>
-                {% endfor %}
-            </div>
-
-            <div class="field">
-                <label for="{{ form.vcf_file.id_for_label }}">VCF File</label>
-                {{ form.vcf_file }}
-                {% for error in form.vcf_file.errors %}
-                    <p class="error">{{ error }}</p>
-                {% endfor %}
-            </div>
-
-            <button type="submit">Upload</button>
-        </form>
     </div>
 </body>
 </html>
