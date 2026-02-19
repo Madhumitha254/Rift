@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VCF Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 560px;
+        }
+        .field {
+            margin-bottom: 1rem;
+        }
+        .field label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+        .error-list {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+        }
+        .error {
+            color: #b91c1c;
+            margin-top: 0.25rem;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+        .success {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+        }
+        button {
+            padding: 0.6rem 1rem;
+            border: 0;
+            border-radius: 6px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload VCF</h1>
+
+        {% if success_message %}
+            <div class="success">
+                <p>{{ success_message }}</p>
+                {% if saved_path %}
+                    <p>Saved to: {{ saved_path }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div class="error-list">
+                {% for error in form.non_field_errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="{{ form.drug_name.id_for_label }}">Drug Name</label>
+                {{ form.drug_name }}
+                {% for error in form.drug_name.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="field">
+                <label for="{{ form.vcf_file.id_for_label }}">VCF File</label>
+                {{ form.vcf_file }}
+                {% for error in form.vcf_file.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</body>
+</html>
