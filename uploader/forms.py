@@ -20,7 +20,7 @@ class VCFUploadForm(forms.Form):
         if not uploaded_file.name.lower().endswith(".vcf"):
             raise ValidationError("File extension must be .vcf.")
 
-        if uploaded_file.size > MAX_FILE_SIZE_BYTES:
+        if uploaded_file.size >= MAX_FILE_SIZE_BYTES:
             raise ValidationError("File size must be less than 5MB.")
 
         return uploaded_file
